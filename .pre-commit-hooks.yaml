@@ -1,0 +1,15 @@
+- id: fennec
+  name: fennec
+  description: Security scanner as fast as a linter
+  entry: fennec --changed
+  language: system
+  pass_filenames: false
+  always_run: true
+
+- id: fennec-secrets
+  name: fennec-secrets
+  description: Scan for leaked credentials
+  entry: fennec secrets --changed
+  language: system
+  pass_filenames: false
+  always_run: true

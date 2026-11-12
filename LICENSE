@@ -1,0 +1,82 @@
+fennec Commercial License Agreement
+
+Copyright (c) 2026 Singularity RD. All rights reserved.
+
+This agreement ("Agreement") governs your use of fennec, including the
+command-line scanner, rule packs, GitHub App, GitHub Action, editor
+extensions, MCP server, documentation and any updates (the "Software"),
+provided by Singularity RD ("Licensor"). By installing, activating or using
+the Software you ("Licensee") agree to this Agreement. If you do not agree,
+do not use the Software.
+
+1. License grant
+   Subject to this Agreement and payment of the applicable fees, Licensor
+   grants Licensee a non-exclusive, non-transferable, non-sublicensable,
+   revocable license to install and use the Software in object-code form,
+   for Licensee's internal business purposes, during the term and within the
+   plan and seat limits stated in the license key issued to Licensee.
+
+2. Trial licenses
+   A trial license key permits evaluation use for the period stated in the
+   key (normally 14 days). When a trial key expires, Licensee must purchase a
+   license or stop using the Software.
+
+3. Seats
+   One seat is required for each individual who authored a commit in a
+   repository scanned by the Software during the preceding 90 days. Automated
+   accounts (bots) do not require seats.
+
+4. Restrictions
+   Licensee shall not, and shall not permit anyone to: (a) copy, modify, or
+   create derivative works of the Software except as needed for permitted
+   use; (b) reverse engineer, decompile or disassemble the Software, except
+   to the extent this restriction is prohibited by applicable law;
+   (c) circumvent, disable or tamper with license-key verification;
+   (d) generate, share, publish or resell license keys; (e) sell, rent,
+   lease, sublicense or provide the Software as a hosted service to third
+   parties; or (f) remove proprietary notices.
+
+5. Ownership
+   The Software is licensed, not sold. Licensor and its licensors retain all
+   right, title and interest in the Software. Third-party components included
+   in the Software are licensed under their own terms, which are reproduced
+   in the accompanying third-party notices and prevail for those components.
+
+6. Fees and term
+   Fees, billing periods and plan limits are stated on the order form or at
+   https://fennec.singularityrd.com/pricing. This Agreement continues for the
+   term of the license key. Licensor may terminate this Agreement if Licensee
+   materially breaches it and does not cure the breach within 30 days of
+   notice. On termination Licensee must stop using and delete the Software.
+
+7. Support and updates
+   Support and updates are provided according to Licensee's plan. Licensor
+   may change or discontinue features with reasonable notice.
+
+8. Confidentiality and data
+   The command-line scanner runs locally and does not send source code to
+   Licensor. Hosted services process repository content only to perform the
+   requested scans and do not retain it after the scan completes.
+
+9. Warranty disclaimer
+   EXCEPT AS EXPRESSLY STATED IN A SIGNED ORDER FORM, THE SOFTWARE IS
+   PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+   AND NON-INFRINGEMENT. A SECURITY SCANNER CANNOT FIND EVERY VULNERABILITY;
+   LICENSEE REMAINS RESPONSIBLE FOR THE SECURITY OF ITS SOFTWARE.
+
+10. Limitation of liability
+   TO THE MAXIMUM EXTENT PERMITTED BY LAW, LICENSOR'S TOTAL LIABILITY UNDER
+   THIS AGREEMENT SHALL NOT EXCEED THE FEES PAID BY LICENSEE IN THE TWELVE
+   MONTHS BEFORE THE CLAIM, AND LICENSOR SHALL NOT BE LIABLE FOR INDIRECT,
+   INCIDENTAL, SPECIAL, CONSEQUENTIAL OR PUNITIVE DAMAGES, OR LOST PROFITS
+   OR DATA.
+
+11. General
+   This Agreement is governed by the laws of the jurisdiction in which
+   Singularity RD is incorporated, without regard to conflict-of-law rules.
+   A signed order form or enterprise agreement prevails over this Agreement
+   where they conflict. If any provision is unenforceable, the remainder
+   stays in effect.
+
+Contact: sales@singularityrd.com

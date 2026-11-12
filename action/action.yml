@@ -1,0 +1,74 @@
+name: "Fennec Security Scan"
+description: "Security scanner as fast as a linter. 200+ built-in rules, 12 source languages, SARIF output."
+author: "Singularity RD"
+
+branding:
+  icon: "shield"
+  color: "orange"
+
+inputs:
+  path:
+    description: "Path to scan"
+    required: false
+    default: "."
+  severity:
+    description: "Minimum severity to report (low, medium, high, critical)"
+    required: false
+    default: "low"
+  format:
+    description: "Output format (terminal, json, sarif)"
+    required: false
+    default: "sarif"
+  version:
+    description: "Fennec version to use (defaults to latest)"
+    required: false
+    default: "latest"
+  fail-on-findings:
+    description: "Fail the check if findings above severity threshold exist"
+    required: false
+    default: "true"
+  upload-sarif:
+    description: "Upload SARIF results to GitHub Code Scanning"
+    required: false
+    default: "true"
+  license-key:
+    description: "fennec license key (FNC1...). Store it as a repository secret, e.g. secrets.FENNEC_LICENSE_KEY"
+    required: true
+  github-token:
+    description: "GitHub token for uploading SARIF results"
+    required: false
+    default: ${{ github.token }}
+
+  badge-label:
+    description: "Custom label for the badge (default: fennec)"
+    required: false
+    default: "fennec"
+
+outputs:
+  findings-count:
+    description: "Number of findings detected"
+    value: ${{ steps.scan.outputs.findings-count }}
+  sarif-file:
+    description: "Path to the SARIF output file"
+    value: ${{ steps.scan.outputs.sarif-file }}
+  badge-json:
+    description: "Path to shields.io endpoint JSON file for dynamic badges"
+    value: ${{ steps.scan.outputs.badge-json }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Fennec
+      id: scan
+      shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_SEVERITY: ${{ inputs.severity }}
+        INPUT_FORMAT: ${{ inputs.format }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_FAIL_ON_FINDINGS: ${{ inputs.fail-on-findings }}
+        INPUT_UPLOAD_SARIF: ${{ inputs.upload-sarif }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        INPUT_BADGE_LABEL: ${{ inputs.badge-label }}
+        FENNEC_LICENSE_KEY: ${{ inputs.license-key }}
+      run: ${{ github.action_path }}/entrypoint.sh
