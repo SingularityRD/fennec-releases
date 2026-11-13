@@ -46,7 +46,7 @@ Each seat covers 2 workstations and 5 concurrent CI jobs. In CI and containers, 
 ## GitHub Action
 
 ```yaml
-- uses: singularityrd/fennec-releases/action@v0.15.0
+- uses: singularityrd/fennec-releases/action@v0.15.1
   with:
     path: .
     severity: medium
@@ -64,7 +64,7 @@ Install fennec first, then add to `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/singularityrd/fennec-releases
-    rev: v0.15.0
+    rev: v0.15.1
     hooks:
       - id: fennec
       - id: fennec-secrets

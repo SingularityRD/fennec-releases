@@ -36,6 +36,30 @@ case "${ARCH}" in
     *)             echo "::error::Unsupported architecture: ${ARCH}"; exit 1 ;;
 esac
 
+# Python counts findings and writes the badge. Windows runners and Git Bash
+# may only have `python` (or a non-working `python3` Store alias), so probe
+# for one that actually runs.
+PYTHON=""
+for candidate in python3 python; do
+    if command -v "${candidate}" >/dev/null 2>&1 && "${candidate}" -c 'import json' >/dev/null 2>&1; then
+        PYTHON="${candidate}"
+        break
+    fi
+done
+if [ -z "${PYTHON}" ]; then
+    echo "::error::Python 3 is required on the runner (python3 or python)"
+    exit 1
+fi
+
+# Paths handed to a native Windows Python must be Windows paths.
+native_path() {
+    if command -v cygpath >/dev/null 2>&1; then
+        cygpath -w "$1"
+    else
+        printf '%s' "$1"
+    fi
+}
+
 if [ "${PLATFORM}" = "windows" ]; then
     BINARY_NAME="fennec-${PLATFORM}-${ARCH_SUFFIX}.exe"
     EXECUTABLE_NAME="fennec.exe"
@@ -119,20 +143,25 @@ EXECUTABLE_PATH="${INSTALL_DIR}/${EXECUTABLE_NAME}"
 
 if [ "${FORMAT}" = "sarif" ]; then
     "${EXECUTABLE_PATH}" "${ARGS[@]}" > "${SARIF_FILE}" || EXIT_CODE=$?
-    FINDINGS_COUNT=$(python3 -c "
+    FINDINGS_COUNT=$("${PYTHON}" -c "
 import json, sys
 try:
-    data = json.load(open('${SARIF_FILE}'))
+    data = json.load(sys.stdin)
     results = data.get('runs', [{}])[0].get('results', [])
     print(len(results))
-except:
+except Exception:
     print(0)
-" 2>/dev/null || echo "0")
+" < "${SARIF_FILE}" 2>/dev/null || echo "0")
 else
-    OUTPUT=$("${EXECUTABLE_PATH}" "${ARGS[@]}" 2>&1) || EXIT_CODE=$?
+    if [ "${FORMAT}" = "json" ]; then
+        # Keep stderr (skip notices, warnings) out of the JSON document.
+        OUTPUT=$("${EXECUTABLE_PATH}" "${ARGS[@]}") || EXIT_CODE=$?
+    else
+        OUTPUT=$("${EXECUTABLE_PATH}" "${ARGS[@]}" 2>&1) || EXIT_CODE=$?
+    fi
     echo "${OUTPUT}"
     if [ "${FORMAT}" = "json" ]; then
-        FINDINGS_COUNT=$(echo "${OUTPUT}" | python3 -c "
+        FINDINGS_COUNT=$(echo "${OUTPUT}" | "${PYTHON}" -c "
 import json, sys
 report = json.load(sys.stdin)
 if isinstance(report, list):
@@ -141,7 +170,7 @@ else:
     print(report.get('finding_counts', {}).get('total', len(report.get('findings', []))))
 " 2>/dev/null || echo "0")
     else
-        FINDINGS_COUNT=$(printf '%s\n' "${OUTPUT}" | python3 "${GITHUB_ACTION_PATH:-$(dirname "$0")}/count-terminal-findings.py")
+        FINDINGS_COUNT=$(printf '%s\n' "${OUTPUT}" | "${PYTHON}" "$(native_path "${GITHUB_ACTION_PATH:-$(dirname "$0")}/count-terminal-findings.py")")
     fi
 fi
 
@@ -176,7 +205,7 @@ else
 fi
 
 BADGE_LABEL="${BADGE_LABEL}" BADGE_MESSAGE="${BADGE_MESSAGE}" BADGE_COLOR="${BADGE_COLOR}" \
-python3 - <<'PY' > "${BADGE_FILE}"
+"${PYTHON}" - <<'PY' > "${BADGE_FILE}"
 import json
 import os
 import sys
