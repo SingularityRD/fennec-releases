@@ -1,0 +1,70 @@
+name: Verify release
+
+# Installs a published release on clean Linux and Windows runners the way a
+# customer would, and checks the license gate and a real scan.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release tag to verify (default latest)
+        required: false
+        default: latest
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      - name: Install with install.sh
+        env:
+          FENNEC_VERSION: ${{ inputs.version }}
+        run: |
+          curl -fsSL https://fennec.singularityrd.com/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Binary runs
+        run: |
+          fennec --version
+          file "$(command -v fennec)"
+      - name: License gate refuses without a key
+        run: |
+          mkdir -p sample && printf 'import os\ndef run(cmd):\n    os.system(cmd)\n' > sample/app.py
+          set +e; fennec sample -q; code=$?; set -e
+          echo "exit $code"; test "$code" = 2
+      - name: Doctor
+        run: fennec doctor || true
+      - name: Scan with a license key
+        env:
+          FENNEC_LICENSE_KEY: ${{ secrets.FENNEC_VERIFY_KEY }}
+        if: ${{ env.FENNEC_LICENSE_KEY != '' }}
+        run: |
+          set +e; fennec sample -f json > out.json; code=$?; set -e
+          echo "exit $code"; test "$code" = 1
+          python3 -c "import json; r=json.load(open('out.json')); n=r['finding_counts']['total']; print('findings', n); assert n >= 1"
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install with install.ps1
+        shell: pwsh
+        env:
+          FENNEC_VERSION: ${{ inputs.version != 'latest' && inputs.version || '' }}
+        run: |
+          irm https://fennec.singularityrd.com/install.ps1 | iex
+          "$env:LOCALAPPDATA\fennec\bin" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+      - name: License gate refuses without a key
+        shell: pwsh
+        run: |
+          fennec --version
+          New-Item -ItemType Directory sample | Out-Null
+          Set-Content sample/app.py "import os`ndef run(cmd):`n    os.system(cmd)`n"
+          fennec sample -q
+          if ($LASTEXITCODE -ne 2) { throw "expected exit 2, got $LASTEXITCODE" }
+          exit 0
